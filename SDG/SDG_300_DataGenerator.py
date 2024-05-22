@@ -1,4 +1,5 @@
 # Add SDG related python files path to system path
+import argparse
 import sys
 import os
 module_path = os.path.dirname(os.path.abspath(__file__))
@@ -24,6 +25,7 @@ from SDG_090_CameraRandomizer import CameraRandomizer
 from SDG_100_YOLOLabeler_IDMask import YOLOLabeler
 from SDG_200_SDGParameter import SDGParameter
 
+from PDG import pdg_utils as pu
 
 class DataGenerator:
     """
@@ -42,10 +44,64 @@ class DataGenerator:
     """
     
     def gen_one_data(self):
+        
+        parser = argparse.ArgumentParser()
+        parser.add_argument("--numberOfSamples", nargs="?", default=2, help="Number of samples to generate")
+        parser.add_argument("--output_dir", nargs="?", default="E:/Unity Datasets/BlenderTestNew/", help="Path to where the final files will be saved ")
+        parser.add_argument("--resolutionX", nargs="?", default=1080, help="Output image resolution X")
+        parser.add_argument("--resolutionY", nargs="?", default=720, help="Output image resolution Y")
+        parser.add_argument("--config_path", nargs="?", default="E:/Unity Datasets/Configuration.json", help="Path to config json")
+
+        args, unknown = parser.parse_known_args()
+
         """ Generates one synthetic data.""" 
         # Instantiating SDG components
         initializer = Initializer()
         parameter = SDGParameter()
+
+        print("****************************")
+        print("fdsgsdfgs numberOfSamples: " + str(args.numberOfSamples))
+        print("****************************")
+        parameter.gen_num = int(args.numberOfSamples)
+
+        output_dir = str(args.output_dir)
+        
+        #dt_string = datetime.now().strftime("%Y/%m/%d_%H-%M-%S")
+        #dataset_root_path = os.path.join(output_dir, "YoloDataset_" + dt_string)
+        parameter.output_img_path = output_dir + "images"
+        parameter.output_label_path = output_dir + "labels"
+
+        print("****************************")
+        print("output_img_path: " + parameter.output_img_path)
+        print("****************************")
+
+        print("****************************")
+        print("output_label_path: " + parameter.output_label_path)
+        print("****************************")
+
+        parameter.img_resolution_x = int(args.resolutionX)
+        parameter.img_resolution_y = int(args.resolutionY)
+
+
+        #read config json
+        config_path = str(args.config_path)
+        print("Reading configuration...")
+        config = pu.GetConfigurationObject(config_path)
+        if config == None:
+            print("Couldn't parse configuration object! Terminating program...")
+            exit(-1)
+        print("Complete!")
+
+        modelPaths = []
+        for model in config.Input.Models:
+            if not model.IsDistractor:
+                modelPaths.append(model.Filepath)
+        
+
+
+
+
+
         initializer.init() # Need to initialize the blender scene at first.
         background_object_placement_randomizer = BackgroundObjectPlacementRandomizer()
         foreground_object_placement_randomizer = ForegroundObjectPlacementRandomizer()

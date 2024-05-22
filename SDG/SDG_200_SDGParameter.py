@@ -55,14 +55,14 @@ class SDGParameter:
 
     def __init__(self):
         self.gen_num = 10
-        self.blender_exe_path = "C:/program Files/Blender Foundation/Blender 3.3/blender"
-        self.asset_background_object_folder_path = "C:/Users/user/Documents/project/Synthetic-Data-Generator-for-Retail-Products-Detection/Assets/background_occluder_object"
-        self.asset_foreground_object_folder_path = "C:/Users/user/Documents/project/Synthetic-Data-Generator-for-Retail-Products-Detection/Assets/foreground_object"
-        self.asset_ambientCGMaterial_folder_path = "C:/Users/user/Documents/project/Synthetic-Data-Generator-for-Retail-Products-Detection/Assets/pbr_texture"
-        self.asset_hdri_lighting_folder_path = "C:/Users/user/Documents/project/Synthetic-Data-Generator-for-Retail-Products-Detection/Assets/hdri_lighting"
-        self.asset_occluder_folder_path = "C:/Users/user/Documents/project/Synthetic-Data-Generator-for-Retail-Products-Detection/Assets/background_occluder_object"
-        self.output_img_path = "C:/Users/user/Documents/project/Synthetic-Data-Generator-for-Retail-Products-Detection/gen_data/images"
-        self.output_label_path = "C:/Users/user/Documents/project/Synthetic-Data-Generator-for-Retail-Products-Detection/gen_data/labels"
+        self.blender_exe_path = "C:/Program Files/Blender Foundation/Blender 3.3/blender"
+        self.asset_background_object_folder_path = "E:/DAIMIA/Synthetic-Data-Generator-for-Retail-Products-Detection/Assets/background_occluder_object"
+        self.asset_foreground_object_folder_path = "E:/DAIMIA/Synthetic-Data-Generator-for-Retail-Products-Detection/Assets/foreground_object"
+        self.asset_ambientCGMaterial_folder_path = "E:/DAIMIA/Synthetic-Data-Generator-for-Retail-Products-Detection/Assets/pbr_texture"
+        self.asset_hdri_lighting_folder_path = "E:/DAIMIA/Synthetic-Data-Generator-for-Retail-Products-Detection/Assets/hdri_lighting"
+        self.asset_occluder_folder_path = "E:/DAIMIA/Synthetic-Data-Generator-for-Retail-Products-Detection/Assets/background_occluder_object"
+        self.output_img_path = "E:/DAIMIA/Synthetic-Data-Generator-for-Retail-Products-Detection/Output/gen_data/images"
+        self.output_label_path = "E:/DAIMIA/Synthetic-Data-Generator-for-Retail-Products-Detection/Output/gen_data/labels"
         self.background_poisson_disk_sampling_radius = 0.2
         self.num_foreground_object_in_scene_range = {"min": 8 ,"max": 20}
         self.foreground_area = [2.5, 1.5, 0.5]

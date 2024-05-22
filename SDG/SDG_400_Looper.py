@@ -8,6 +8,13 @@ from SDG_200_SDGParameter import SDGParameter
 import collections
 import time
 
+import argparse
+from datetime import datetime
+
+from PDG.Handlers import CommunicationHandlerModule as chm  # Replace some_function with the actual functions/classes you want to import
+from PDG import pdg_utils as pu
+from PDG.Model.CustomModel import CustomModel
+
 
 class Looper:
     """ 
@@ -143,6 +150,49 @@ class Looper:
 
         # Passing gen_num param
         parameter = SDGParameter()
+        
+        #################################
+
+        # TODO: get args
+        parser = argparse.ArgumentParser()
+        parser.add_argument("--config_path", nargs="?", default="E:/Unity Datasets/Configuration.json", help="Path to config json")
+        parser.add_argument("--output_dir", nargs="?", default="E:/Unity Datasets/BlenderTestNew/", help="Path to where the final files will be saved ")
+        parser.add_argument("--resolutionX", nargs="?", default=1080, help="Output image resolution X")
+        parser.add_argument("--resolutionY", nargs="?", default=720, help="Output image resolution Y")
+        parser.add_argument("--numberOfSamples", nargs="?", default=2, help="Number of samples to generate")
+        parser.add_argument("--port", nargs="?", default=3333, help="Port to use for communication")
+        args = parser.parse_args()
+
+        print("****************************")
+        print("numberOfSamples: " + str(args.numberOfSamples))
+        print("****************************")
+
+        parameter.gen_num = int(args.numberOfSamples)
+        output_dir = str(args.output_dir)
+        print("****************************")
+        print("output_dir: " + output_dir)
+        print("****************************")
+        #dt_string = datetime.now().strftime("%Y/%m/%d_%H-%M-%S")
+        #dataset_root_path = os.path.join(output_dir, "YoloDataset_" + dt_string)
+        parameter.output_img_path = os.path.join(output_dir,"/images")
+        parameter.output_label_path = os.path.join(output_dir,"/labels")
+
+        resolutionX = str(args.resolutionX)
+        resolutionY = str(args.resolutionY)
+
+
+        comHandler = None
+        print("Initializing communication handler...")
+        try:
+            comHandler = chm.CommunicationHandler('localhost', int(args.port))
+        except:
+            print("Failed!")
+        else:
+            print("Complete!")
+
+        config_path = str(args.config_path)
+
+        #################################
         self.__gen_num = parameter.gen_num
 
         while self.__gen_num_counter < self.__gen_num:
@@ -163,7 +213,18 @@ class Looper:
                 "--python", # Run the given Python script file.
                 data_generator_path,
                 "--window-geometry","0","0","100","100", # Open with lower left corner at <sx>, <sy> and width and height as <w>, <h>.
-                "--no-window-focus" # Open behind other windows and without taking focus.
+                "--no-window-focus", # Open behind other windows and without taking focus.
+                "--",
+                "--numberOfSamples",
+                str(parameter.gen_num),
+                "--output_dir",
+                output_dir,    
+                "--resolutionX",
+                resolutionX,
+                "--resolutionY",
+                resolutionY,
+                "--config_path",
+                config_path
                 ]
 
             # Create new process

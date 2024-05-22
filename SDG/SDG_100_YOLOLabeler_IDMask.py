@@ -325,8 +325,18 @@ class YOLOLabeler:
         splitted_coordinates = text_coordinates.split('\n')[:-1] # Delete last '\n' in coordinates
 
         # Save labels
-        text_file_path = os.path.join(self.output_label_path, str(self.__gen_img_id)+".txt")
-        text_file = open(text_file_path, 'w+') # Open .txt file of the label
+        #text_file_path = os.path.join(self.output_label_path, str(self.__gen_img_id)+".txt")
+        text_file_path = self.output_label_path + "/" + self.__gen_img_id + ".txt"
+        print("+-+-+-+-+----TESTTTTTTTTT: " + text_file_path)
+
+        # Extract the directory path
+        directory = os.path.dirname(text_file_path)
+
+        # Create the directory if it doesn't exist
+        if not os.path.exists(directory):
+            os.makedirs(directory)
+
+        text_file = open(text_file_path, 'w') # Open .txt file of the label
         text_file.write('\n'.join(splitted_coordinates))
         text_file.close()
 
