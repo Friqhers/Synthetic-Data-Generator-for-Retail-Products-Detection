@@ -76,7 +76,7 @@ class SDGParameter:
         self.hdri_lighting_strength_range = {"min": 0.2 , "max": 2.2}
         self.img_resolution_x = 1728
         self.img_resolution_y = 1152
-        self.max_samples = 128
+        self.max_samples = 16
         self.chromatic_aberration_probability = 0.1
         self.blur_probability = 0.1
         self.motion_blur_probability = 0.1
