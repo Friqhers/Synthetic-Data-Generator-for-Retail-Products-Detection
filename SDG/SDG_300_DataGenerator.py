@@ -47,13 +47,19 @@ class DataGenerator:
     def gen_one_data(self):
         
         parser = argparse.ArgumentParser()
-        parser.add_argument("--numberOfSamples", nargs="?", default=2, help="Number of samples to generate")
+        #parser.add_argument("--numberOfSamples", nargs="?", default=2, help="Number of samples to generate")
         parser.add_argument("--output_dir", nargs="?", default="E:/Unity Datasets/BlenderTestNew/", help="Path to where the final files will be saved ")
         parser.add_argument("--resolutionX", nargs="?", default=1080, help="Output image resolution X")
         parser.add_argument("--resolutionY", nargs="?", default=720, help="Output image resolution Y")
         parser.add_argument("--config_path", nargs="?", default="E:/Unity Datasets/Configuration.json", help="Path to config json")
+        parser.add_argument("--currentSample", nargs="?", default= "bune ya", help="current sample")
 
         args, unknown = parser.parse_known_args()
+
+        # Debugging: Print the received arguments
+        print("Received arguments:")
+        print(args)
+      
 
         """ Generates one synthetic data.""" 
         # Instantiating SDG components
@@ -61,9 +67,9 @@ class DataGenerator:
         parameter = SDGParameter()
 
         print("****************************")
-        print("fdsgsdfgs numberOfSamples: " + str(args.numberOfSamples))
+        #print("fdsgsdfgs numberOfSamples: " + str(args.numberOfSamples))
         print("****************************")
-        parameter.gen_num = int(args.numberOfSamples)
+        #parameter.gen_num = int(args.numberOfSamples)
 
         output_dir = str(args.output_dir)
         
@@ -105,6 +111,10 @@ class DataGenerator:
             print("No model to load in config! Terminating program...")
             exit(-1)
 
+
+        print("****************************")
+        print("Current : " + str(args.currentSample))
+        print("****************************")
         
 
 
@@ -118,7 +128,7 @@ class DataGenerator:
         unified_rotation_randomizer = UnifiedRotationRandomizer()
         light_randomizer = LightRandomizer()
         camera_randomizer = CameraRandomizer()
-        yolo_labeler = YOLOLabeler()
+        yolo_labeler = YOLOLabeler(int(args.currentSample))
 
         print("Components Initialize Completed!!!")
 

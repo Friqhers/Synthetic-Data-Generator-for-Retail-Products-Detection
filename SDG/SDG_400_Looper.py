@@ -157,9 +157,9 @@ class Looper:
         parser = argparse.ArgumentParser()
         parser.add_argument("--config_path", nargs="?", default="E:/Unity Datasets/Configuration.json", help="Path to config json")
         parser.add_argument("--output_dir", nargs="?", default="E:/Unity Datasets/BlenderTestNew/", help="Path to where the final files will be saved ")
-        parser.add_argument("--resolutionX", nargs="?", default=1080, help="Output image resolution X")
+        parser.add_argument("--resolutionX", nargs="?", default=1280, help="Output image resolution X")
         parser.add_argument("--resolutionY", nargs="?", default=720, help="Output image resolution Y")
-        parser.add_argument("--numberOfSamples", nargs="?", default=2, help="Number of samples to generate")
+        parser.add_argument("--numberOfSamples", nargs="?", default=5, help="Number of samples to generate")
         parser.add_argument("--port", nargs="?", default=3333, help="Port to use for communication")
         args = parser.parse_args()
 
@@ -195,7 +195,11 @@ class Looper:
         #################################
         self.__gen_num = parameter.gen_num
 
+        currentSample = 0
         while self.__gen_num_counter < self.__gen_num:
+            currentSample += 1
+            currentSampleStr : str = str(currentSample)
+            print("Current Sampleeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeee: " + currentSampleStr)
 
             # Log start time
             self.__start_time = time.time()
@@ -210,27 +214,29 @@ class Looper:
             # Set args[2]
             args = [
                 blender_exe_path,
-                "--python", # Run the given Python script file.
+                "-P", # Run the given Python script file.
                 data_generator_path,
                 "--window-geometry","0","0","100","100", # Open with lower left corner at <sx>, <sy> and width and height as <w>, <h>.
                 "--no-window-focus", # Open behind other windows and without taking focus.
-                "--",
-                "--numberOfSamples",
-                str(parameter.gen_num),
-                "--output_dir",
-                output_dir,    
-                "--resolutionX",
-                resolutionX,
-                "--resolutionY",
-                resolutionY,
-                "--config_path",
-                config_path
+                #"--",
+                #"--numberOfSamples",
+                #str(parameter.gen_num),
+                "--currentSample", currentSampleStr,
+                "--output_dir",    output_dir,    
+                "--resolutionX",   resolutionX,
+                "--resolutionY",   resolutionY,
+                "--config_path",   config_path,
                 ]
+            
+            # Debugging: Print the command to be executed
+            print("Running command:")
+            print(" ".join(args))
 
             # Create new process
             subprocess.run(args)
 
             self.__gen_num_counter += 1
+            
             
             # Log end time
             self.__end_time = time.time()
@@ -241,6 +247,10 @@ class Looper:
             print(f"Generate 1k Images ETA: {self.__gen_1k_imgs_eta}")
             print(f"Already Generated {self.__gen_num_counter}/{self.__gen_num} Images")
             print(f"Remain {self.__remain_gen_num} Images Need To Generate, ETA: {self.__gen_n_imgs_eta}")
+
+            if comHandler:
+                message = "@sample=" + str(self.__gen_num_counter)
+                comHandler.send(message.encode())
 
         print(f"Generate {self.__gen_num} Images COMPLERED !!!")
 
