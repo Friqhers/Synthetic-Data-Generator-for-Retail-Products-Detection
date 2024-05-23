@@ -45,10 +45,12 @@ class YOLOLabeler:
 
     """ 
     def __init__(self,
+                 currentSample,
                  output_img_path = "C:/Users/user/Documents/project/Synthetic-Data-Generator-for-Retail-Products-Detection/gen_data/images",
                  output_label_path = "C:/Users/user/Documents/project/Synthetic-Data-Generator-for-Retail-Products-Detection/gen_data/labels"
                  ):
-                 
+        self.currentSample = currentSample
+        self.paddingLength = 6
         self.output_img_path = output_img_path
         self.output_label_path = output_label_path
         self.__obj_name_and_id_dict = {}
@@ -138,10 +140,11 @@ class YOLOLabeler:
 
     def __create_gen_img_id(self):
         """Create a unique ID for generated synthetic image data."""
-        now = datetime.datetime.now(tz=datetime.timezone(datetime.timedelta(hours=8)))
-        time_id = now.strftime("%Y%m%d%H%M%S").zfill(15)
-        render_machine_id = self.__render_machine_id
-        self.__gen_img_id = render_machine_id + time_id
+        #now = datetime.datetime.now(tz=datetime.timezone(datetime.timedelta(hours=8)))
+        #time_id = now.strftime("%Y%m%d%H%M%S").zfill(15)
+        #render_machine_id = self.__render_machine_id
+        #self.__gen_img_id = render_machine_id + time_id
+        self.__gen_img_id = str(self.currentSample).zfill(self.paddingLength)
 
         return id
     
