@@ -26,6 +26,7 @@ from SDG_100_YOLOLabeler_IDMask import YOLOLabeler
 from SDG_200_SDGParameter import SDGParameter
 
 from PDG import pdg_utils as pu
+from PDG.configs.pdg_configuration import Model
 
 class DataGenerator:
     """
@@ -92,19 +93,24 @@ class DataGenerator:
             exit(-1)
         print("Complete!")
 
+        inputModels : Model = config.Input.Models
+
         modelPaths = []
         for model in config.Input.Models:
             if not model.IsDistractor:
                 modelPaths.append(model.Filepath)
+                print(model.Filepath)
+
+        if len(modelPaths) == 0:
+            print("No model to load in config! Terminating program...")
+            exit(-1)
+
         
-
-
-
 
 
         initializer.init() # Need to initialize the blender scene at first.
         background_object_placement_randomizer = BackgroundObjectPlacementRandomizer()
-        foreground_object_placement_randomizer = ForegroundObjectPlacementRandomizer()
+        foreground_object_placement_randomizer = ForegroundObjectPlacementRandomizer(inputModelsInfo=inputModels)
         occluder_placement_randomizer = OccluderPlacementRandomizer()
         object_scale_randomizer = ObjectScaleRandomizer()
         texture_randomizer = TextureRandomizer()

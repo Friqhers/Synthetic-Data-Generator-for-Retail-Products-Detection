@@ -8,6 +8,22 @@ import os
 import glob
 import sys
 
+from PDG.configs.pdg_configuration import Model
+from typing import List
+
+def GetNewScaleFromCentimeters(targetObjectName : str, targetCm : float) -> float :
+    # Convert target size to Blender units (1 unit = 1 meter)
+    targetSizeBlender = targetCm / 100.0
+
+    # bounds of the object
+    #bounds = bpy.data.objects[targetObjectName].children[0].dimensions
+    bounds = bpy.data.objects[targetObjectName].dimensions
+    print(bounds)
+    print(bpy.data.objects[targetObjectName].dimensions)
+
+    scale = targetSizeBlender / (max(bounds.x, max(bounds.y, bounds.z)))
+
+    return scale
 
 class ForegroundObjectPlacementRandomizer:
     """
@@ -41,6 +57,7 @@ class ForegroundObjectPlacementRandomizer:
     """
 
     def __init__(self,
+                 inputModelsInfo : List[Model],
                  num_foreground_object_in_scene_range = {"min": 8 , "max": 20},
                  foreground_area = [2, 1.5, 0.5],
                  foreground_poisson_disk_sampling_radius = 0.3,
@@ -55,16 +72,17 @@ class ForegroundObjectPlacementRandomizer:
         self.__foreground_object_collection = bpy.data.collections["ForegroundObjectCollection"]
         self.__n_particle = None
         self.__particle_coordinates = None
+        self.inputModelsInfo= inputModelsInfo
 
 
-    def __error_check(self,asset_path_list):
+    def __error_check(self):
         """Check assigned background object assets folder path isn't empty.
 
         Args:
             asset_path_list (list of str): list of the path to background object assets.
 
         """ 
-        num_asset_in_folder = len(asset_path_list)
+        num_asset_in_folder = len(self.inputModelsInfo)
         if num_asset_in_folder < 1:
             print(f'ERROR!!! can not find any foreground asset in {self.asset_foreground_object_folder_path}')
             input("Press Enter to continue...")
@@ -92,6 +110,44 @@ class ForegroundObjectPlacementRandomizer:
             if obj is not None:
                 self.__foreground_object_collection.objects.link(obj)
 
+    def __load_object_obj(self, modelInfo : Model):
+        """Load asset from other .obj to the current blendfile.
+
+        Args:
+            obj_filepath (str): The path to background object assets.
+        """ 
+        old_objs = set(bpy.context.scene.objects)
+        importedObject = bpy.ops.wm.obj_import(filepath = modelInfo.Filepath)
+        imported_objs = set(bpy.context.scene.objects) - old_objs
+        print(imported_objs)
+
+        for o in bpy.context.selected_objects:
+            print(o)
+        
+        # Convert set to list to access the first element
+        imported_objs_list = list(imported_objs)
+
+        print("***********************+++++++********")
+        
+        # Scale object by given centimer value
+        maxCentimeter = max(modelInfo.UserProvidedCentimeterScale.X, max(modelInfo.UserProvidedCentimeterScale.Y, modelInfo.UserProvidedCentimeterScale.Z))
+        newScale = GetNewScaleFromCentimeters(imported_objs_list[0].name, maxCentimeter)
+        print("newScale: " + str(newScale))
+        imported_objs_list[0].scale = (newScale, newScale, newScale)
+        # To apply the scale so that the object's transformation matrix is updated
+        bpy.ops.object.transform_apply(location=False, rotation=False, scale=True)
+
+        self.__foreground_object_collection.objects.link(imported_objs_list[0])
+        print("***********************+++++++********")
+        print(self.__foreground_object_collection.objects)
+
+        ## Append object from .blend file
+  
+        ## Link object to current scene
+        #for obj in importedObject.objects:
+        #    if obj is not None:
+        #        self.__foreground_object_collection.objects.link(obj)
+
 
     def __posson_disc_sampling(self):
         """Generate the sampling with a spatially variable sampling radius."""
@@ -116,10 +172,15 @@ class ForegroundObjectPlacementRandomizer:
             sys.exit()
         
         # Get foreground object asset path
-        foreground_object_path_list = glob.glob(os.path.join(self.asset_foreground_object_folder_path, "*.blend"))
-        self.__error_check(asset_path_list = foreground_object_path_list)
-        num_fg_obj = len(foreground_object_path_list)
-        print("num fg obj in folder: {}".format(num_fg_obj))
+        #foreground_object_path_list = glob.glob(os.path.join(self.asset_foreground_object_folder_path, "*.blend"))
+        self.__error_check()
+        #num_fg_obj = len(foreground_object_path_list)
+        #print("num fg obj in folder: {}".format(num_fg_obj))
+
+        for model in self.inputModelsInfo:
+            self.__load_object_obj(modelInfo = model)
+
+        return
 
         # Check num_foreground_object_in_scene is bigger than num_fg_obj
         if self.__num_foreground_object_in_scene >= num_fg_obj:
@@ -166,9 +227,12 @@ class ForegroundObjectPlacementRandomizer:
         # Move all foregeound objects to fg_location
         fg_obj_list = []
         for fg_obj in self.__foreground_object_collection.objects:
+            print(fg_obj)
             fg_obj_list.append(fg_obj)
+        
+        print(fg_obj_list)
 
-        for i in range(self.__num_foreground_object_in_scene):
+        for i in range(len(fg_obj_list)):
             obj_location = (fg_location[i][0],fg_location[i][1], fg_location[i][2])
             fg_obj_list[i].location = obj_location
         
