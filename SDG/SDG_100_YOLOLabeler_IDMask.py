@@ -286,9 +286,11 @@ class YOLOLabeler:
         # Initialize the variable where we'll store the coordinates
         main_text_coordinates = ''
         # Loop through all of the objects
+        i = 0
         for obj_name in self.__obj_name_and_bbox_dict:
             # Get current object's coordinates
             obj_class_id = self.__get_obj_class_id(obj_name)
+            obj_class_id = i
             coordinates = self.__obj_name_and_bbox_dict[obj_name]
             # Reformat coordinates to YOLOv3 format
             text_coordinates = self.__format_coordinates(coordinates, obj_class_id)
@@ -298,6 +300,8 @@ class YOLOLabeler:
             # Line corresponding to each object in the current image
             if text_coordinates:
                 main_text_coordinates = main_text_coordinates + text_coordinates
+            
+            i = i + 1
                                                                             
         return main_text_coordinates # Return all coordinates
 
