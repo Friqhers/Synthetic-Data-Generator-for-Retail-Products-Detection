@@ -315,8 +315,9 @@ class YOLOLabeler:
         self.__create_and_switch_annotation_scene()
 
         #　Save png img
-        img_file_path = os.path.join(self.output_img_path,  str(self.__gen_img_id)+".png")
+        img_file_path = os.path.join(self.output_img_path,  str(self.__gen_img_id)) + ".jpg"
         bpy.data.scenes["Scene"].render.filepath = img_file_path 
+        bpy.data.scenes["Scene"].render.image_settings.file_format = 'JPEG'
         print("Start Render Image")         
         bpy.ops.render.render(write_still=True, scene='Scene')
         print("End Render Image")
